@@ -1,0 +1,10 @@
+{
+  "name": "words-in-lyrics",
+  "version": "0.0.0",
+  "description": "Calculate word frequency for artists using metro lyrics",
+  "main": "server.js",
+  "repository": "",
+  "author": "Cody Seavey <seave037@d.umn.edu>",
+  "dependencies": {
+  }
+}
