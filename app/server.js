@@ -10,7 +10,7 @@ app.get('/', function(req,res){
 });
 
 app.get('/process_get', function(req, res) {
-  
+
   var artist = req.query.artist; //get from html form
   var re = new RegExp(" ", 'g');
   artist = artist.replace(re, '-');
@@ -20,16 +20,22 @@ app.get('/process_get', function(req, res) {
 
   res.writeHead(200, {'Content-Type': 'text/html'});
   res.write("<h1>"+artist+"</h1>");
-  
+
   var nextUrl = "http://www.metrolyrics.com/"+artist+"-alpage-1.html";  //starting page
-  
+
+  request(nextUrl, function (error, response, body) {
+    if (error || response.statusCode != 200) {
+		res.write("<h2>Artist could not be found</h2>")
+    }
+  })
+
   async.whilst(function(){ return nextUrl !== "javascript:void(0)" && nextUrl !== undefined;}, //go until there are no more pages (aka you can no longer click on the next button)
-    function(next){ 
+    function(next){
       request(nextUrl,function(err,resp,html){ //get current page
         if(!err){
           var $ = cheerio.load(html);
           var urls = $(".songs-table.compact a"); //get all the links for the lyrics to every song
-          
+
           async.each(urls,function(url,doneCallback){  //async each loop
             var urll = $(url).attr("href");
             var title = $(url).attr('title').toLowerCase();
@@ -52,14 +58,14 @@ app.get('/process_get', function(req, res) {
         });
       }
     });
-    
+
   }, function(err){
     if (!err){
       var cleaned = clean(words, counter); //why u no include last page with words?
       res.write("Songs Analyzed: " + songNumber + "<br><br>");
       for(var i = 0; i < cleaned.length; i++){
-        res.write(cleaned[i].word + " : "); 
-        res.write(cleaned[i].count+"<br>"); 
+        res.write(cleaned[i].word + " : ");
+        res.write(cleaned[i].count+"<br>");
       }
       res.end();
     }
@@ -73,14 +79,13 @@ app.listen(8080, function(){
 var clean = function(words,counter){
   counter = {};
   words = words.replace(/\s+/g, " ").replace(/[^a-zA-Z ]/g, "").toLowerCase();
-  
+
   var data = fs.readFileSync('common.txt', 'utf8').toString().split("\n");
   for(var i in data){
     var re = new RegExp(" "+data[i]+" ", 'g');
     words = words.replace(re, ' ');
-  } 
-  
-  
+  }
+
   words.split(" ").forEach(function (word) {
     if (word.length > 20){
       return;
