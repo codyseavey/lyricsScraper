@@ -1,4 +1,4 @@
-FROM node:4.4.6
+FROM node:latest
 
 ADD app lyrics
 WORKDIR /lyrics/

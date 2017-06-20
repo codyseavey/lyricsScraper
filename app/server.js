@@ -10,7 +10,6 @@ app.get('/', function(req,res){
 });
 
 app.get('/process_get', function(req, res) {
-
   var artist = req.query.artist; //get from html form
   var re = new RegExp(" ", 'g');
   artist = artist.replace(re, '-');
@@ -44,7 +43,6 @@ app.get('/process_get', function(req, res) {
                 if(!err){
                   var $page = cheerio.load(html);
                   words += $page(".js-lyric-text").text() + " ";
-                  console.log(title);
                   songNumber += 1;
                   return doneCallback();
                 }
@@ -63,10 +61,11 @@ app.get('/process_get', function(req, res) {
     if (!err){
       var cleaned = clean(words, counter); //why u no include last page with words?
       res.write("Songs Analyzed: " + songNumber + "<br><br>");
+      a = []
       for(var i = 0; i < cleaned.length; i++){
-        res.write(cleaned[i].word + " : ");
-        res.write(cleaned[i].count+"<br>");
+        a.push(cleaned[i].word + ":" + cleaned[i].count + "<br>")
       }
+      res.write(a.join(''))
       res.end();
     }
   });
