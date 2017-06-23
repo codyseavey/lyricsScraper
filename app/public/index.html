@@ -1,0 +1,55 @@
+<!doctype html>
+
+<!-- ASSIGN OUR ANGULAR MODULE -->
+<html ng-app="lyrics">
+<head>
+    <!-- META -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Optimize mobile viewport -->
+
+    <title>Words in Lyrics</title>
+
+    <!-- SCROLLS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"><!-- load bootstrap -->
+    <style>
+        html                    { overflow-y:scroll; }
+        body                    { padding-top:50px; }
+        #lyric-list              { margin-bottom:30px; }
+    </style>
+
+    <!-- SPELLS -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+    <script src="core.js"></script>
+
+</head>
+
+<body ng-controller="mainController">
+    <div class="container">
+<!--         <div class="jumbotron text-center">
+            <h1>Words in Lyrics</h1>
+        </div>
+ -->
+        <div id="artist-form" class="row">
+            <div class="col-sm-8 col-sm-offset-2 text-center">
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control input-lg text-center" placeholder="Enter an artist here." ng-model="formData.text">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="getArtistLyrics()">Search</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="lyric-list" class="row">
+            {{lyrics | json }}
+            <!-- <div class="col-sm-4 col-sm-offset-4"> -->
+                <!-- <div class="list" ng-repeat="lyric in lyrics"> -->
+                        <!-- <p>{{ lyric }}</p> -->
+                <!-- </div> -->
+            <!-- </div> -->
+        </div>
+    </div>
+
+</body>
+</html>

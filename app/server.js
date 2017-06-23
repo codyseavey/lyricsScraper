@@ -1,30 +1,30 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
 var cheerio = require('cheerio');
 var request = require('request');
 var async = require('async');
 var fs = require('fs');
 
-app.get('/', function(req,res){
-  res.sendFile(__dirname+'/index.html');
-});
+app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
+app.use(bodyParser.json());                                     // parse application/json
+app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 
-app.get('/process_get', function(req, res) {
-  var artist = req.query.artist; //get from html form
+app.post('/api/count', function(req, res) {
+  console.log(req.body)
+  var artist = req.body.text; 
   var re = new RegExp(" ", 'g');
   artist = artist.replace(re, '-');
   var words = ""; //words from each song in string
   var counter = {}; //analyze words and put them into json form
   var songNumber = 0;
 
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.write("<h1>"+artist+"</h1>");
-
   var nextUrl = "http://www.metrolyrics.com/"+artist+"-alpage-1.html";  //starting page
 
   request(nextUrl, function (error, response, body) {
-    if (error || response.statusCode != 200) {
-		res.write("<h2>Artist could not be found</h2>")
+    if (error) {
+      res.send(error)
     }
   })
 
@@ -60,26 +60,20 @@ app.get('/process_get', function(req, res) {
   }, function(err){
     if (!err){
       var cleaned = clean(words, counter); //why u no include last page with words?
-      res.write("Songs Analyzed: " + songNumber + "<br><br>");
-      a = []
+      var lyrics = {};
       for(var i = 0; i < cleaned.length; i++){
-        a.push(cleaned[i].word + ":" + cleaned[i].count + "<br>")
+        lyrics[cleaned[i].word] = cleaned[i].count
       }
-      res.write(a.join(''))
-      res.end();
+      res.json(lyrics)
     }
   });
-});
-
-app.listen(8080, function(){
-  console.log("Server listening...");
 });
 
 var clean = function(words,counter){
   counter = {};
   words = words.replace(/\s+/g, " ").replace(/[^a-zA-Z ]/g, "").toLowerCase();
 
-  var data = fs.readFileSync('common.txt', 'utf8').toString().split("\n");
+  var data = fs.readFileSync('./public/common.txt', 'utf8').toString().split("\n");
   for(var i in data){
     var re = new RegExp(" "+data[i]+" ", 'g');
     words = words.replace(re, ' ');
@@ -108,3 +102,11 @@ var clean = function(words,counter){
 
   return count.slice(0, 30);
 };
+
+app.get('*', function(req, res) {
+  res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+});
+
+app.listen(8080, function(){
+  console.log("Server listening...");
+});
