@@ -71,7 +71,9 @@ app.post('/api/count', function(req, res) {
 
 var clean = function(words,counter){
   counter = {};
-  words = words.replace(/\s+/g, " ").replace(/[^a-zA-Z ]/g, "").toLowerCase();
+  words = words.replace(/[^0-9a-zA-Z\s]/g,"").toLowerCase();
+  console.log(words)
+
 
   var data = fs.readFileSync('./public/common.txt', 'utf8').toString().split("\n");
   for(var i in data){
